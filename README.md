@@ -14,5 +14,3 @@
 - Makefile would produce execute project in build directory. You would find as ./build/bankSleep. 
 - For CMakeLists, you are recommended to make a directory firstly, then enter the directory and run "cmake .. && make -j8"
 - Download the model from 
-
-
