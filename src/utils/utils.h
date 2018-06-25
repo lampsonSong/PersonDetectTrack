@@ -19,5 +19,3 @@ float angle_cos(const cv::Point2f &p1, const cv::Point2f &p2);
 float norm2(const cv::Point2f &p);
 
 float angleCosComputation(const cv::Point2f &p1, const cv::Point2f &p2);
-
-std::vector<double> calc_variance(const std::vector<cv::Point2d> &kp);
