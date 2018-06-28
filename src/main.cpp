@@ -29,9 +29,6 @@ DEFINE_string(video_path, "", "input video file path.");
 DEFINE_int32(video_start_idx, 0, "start index in video capture .");
 
 DEFINE_int32(camera_id, 0, "camera id.");
-DEFINE_int32(flag_record, 0, "0 for raw video, 1 for event pieces, \
-    due to limited HW de/encode engine, one to record the UI, one  \
-    to record raw video or event pieces");
 
 DECLARE_bool(version);
 DECLARE_bool(help);
