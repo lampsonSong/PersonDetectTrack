@@ -9,7 +9,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread/thread.hpp>
 
-#include "application/bank_video_analysis.h"
+#include "application/application.h"
 #include "io/ring_buffer.h"
 #include "io/video_reader.h"
 #include "ui/display.h"
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
   Display display;
   display.start();
 
-  BankVideoAnalysis app;
+  VideoAnalysis app;
   app.init(size, net_width, net_height, display);
   
   app.run();
