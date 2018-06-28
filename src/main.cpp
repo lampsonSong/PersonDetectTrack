@@ -19,6 +19,7 @@ DEFINE_int32(gpu_id, 0, "gpu device id.");
 DEFINE_int32(model_mode, 1, "model mode.");
 DEFINE_int32(ring_buffer_size, 30, "ring bufer length");
 DEFINE_int32(interval, 4, "detecting frame interval");
+
 DEFINE_double(read_delay, 0.040, "software reading delay.");
 
 DEFINE_string(img_prefix, "", "input image sequence path prefix.");
