@@ -11,7 +11,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/tracking.hpp>
 
-#include "algorithm/ulspose/types.h"
+#include "algorithm/pose_estimation/types.h"
 #include "utils/buf_queue.h"
 #include "utils/logging_switch.h"
 #include "utils/timer.h"

@@ -3,7 +3,7 @@
 #include <opencv2/core.hpp>
 #include <vector>
 
-#include "algorithm/ulspose/types.h"
+#include "algorithm/pose_estimation/types.h"
 
 class FrameData {
 public:
