@@ -5,7 +5,7 @@
 #include <opencv2/imgproc.hpp>
 #include <thread>
 
-#include "bank_video_analysis.h"
+#include "application.h"
 #include "utils/logging_switch.h"
 #include "utils/timer.h"
 #include "utils/utils.h"
@@ -79,29 +79,14 @@ void VideoAnalysis::init(const cv::Size size, int net_width, int net_height,
   if (FLAGS_model_mode == 0) {
     proto_file = "pose_deploy_cpm.prototxt";
     model_file = "cpm.caffemodel";
-    model_bin = "data/model/model_small.bin";
   } else {
     proto_file = "pose_deploy_paf.prototxt";
     model_file = "paf.caffemodel";
-    model_bin = "data/model/model_big.bin";
   }
   fileLists.push_back(proto_file);
   fileLists.push_back(model_file);
-  ULSeeEncryption ule(fileLists);
-  auto decoderFiles = ule.doDecoder(model_bin);
-
-  std::vector<char> proto_name = decoderFiles[proto_file];
-  std::vector<char> model_name = decoderFiles[model_file];
-
-  vectorwrapbuf<char> protobuf(proto_name);
-  std::istream proto_stream(&protobuf);
-  param.proto_pointer = &proto_stream;
-
-  vectorwrapbuf<char> modelbuf(model_name);
-  std::istream model_stream(&modelbuf);
-  param.model_pointer = &model_stream;
-
-  pose_ = std::make_unique<PoseEstimation>(param);
+    
+	pose_ = std::make_unique<PoseEstimation>(param);
 
 
   FrameData *frame;
