@@ -72,68 +72,68 @@ void CTracker::update(const cv::Mat &frame, DetectionList &dets) {
       }
       std::for_each(threads.begin(), threads.end(),
                     [](std::thread &x) { x.join(); });
-    }
 
-    distMatrix_t Cost(N * M);
-    for (size_t i = 0; i < N; i++) {
-      for (size_t j = 0; j < M; j++) {
-        auto dist = tracks[i]->calc_distance(dets[j]);
-        Cost[i + j * N] = dist;
-      }
-    }
-
-    // Solving assignment problem (tracks and detections)
-    AssignmentProblemSolver APS;
-    APS.Solve(Cost, N, M, assignment, AssignmentProblemSolver::optimal);
-
-    for (size_t i = 0; i < assignment.size(); i++) {
-      if (assignment[i] != -1) {
-        if ((1.0 - Cost[i + assignment[i] * N]) < dist_thres_) {
-          assignment[i] = -1;
+      distMatrix_t Cost(N * M);
+      for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
+          auto dist = tracks[i]->calc_distance(dets[j]);
+          Cost[i + j * N] = dist;
         }
       }
-      // If track didn't get detects long time, remove it.
-      if (tracks[i]->skippedFrames_ > max_skipped_frames_) {
-        tracks.erase(tracks.begin() + i);
-        assignment.erase(assignment.begin() + i);
-        i--;
+
+      // Solving assignment problem (tracks and detections)
+      AssignmentProblemSolver APS;
+      APS.Solve(Cost, N, M, assignment, AssignmentProblemSolver::optimal);
+
+      for (size_t i = 0; i < assignment.size(); i++) {
+        if (assignment[i] != -1) {
+          if ((1.0 - Cost[i + assignment[i] * N]) < dist_thres_) {
+            assignment[i] = -1;
+          }
+        }
+        // If track didn't get detects long time, remove it.
+        if (tracks[i]->skippedFrames_ > max_skipped_frames_) {
+          tracks.erase(tracks.begin() + i);
+          assignment.erase(assignment.begin() + i);
+          i--;
+        }
       }
     }
-  }
 
-  // Search for unassigned detects and start new tracks for them.
-  for (size_t i = 0; i < dets.size(); ++i) {
-    if (find(assignment.begin(), assignment.end(), i) == assignment.end()) {
-      tracks.push_back(
-          std::make_unique<CTrack>(tracker_type_, dets[i], 0, 300));
-      cv::Rect2d currBox;
-      currBox.x = dets[i].bbox_.x;
-      currBox.y = dets[i].bbox_.y;
-      currBox.width = dets[i].bbox_.width;
-      currBox.height = dets[i].bbox_.height;
-      tracks.back()->init(frame, currBox);
-      tracks.back()->skippedFrames_ = 0;
-    }
-  }
-
-  // Update trajectory
-  for (size_t i = 0; i < tracks.size(); i++) {
-    // If track updated less than one time, than filter state is not correct.
-    if (i < assignment.size()) {
-      int j = assignment[i];
-      if (j != -1) {
-        // If we have assigned detect, then update using its coordinates,
-        tracks[i]->skippedFrames_ = 0;
-        tracks[i]->push_back(dets[j]);
+    // Search for unassigned detects and start new tracks for them.
+    for (size_t i = 0; i < dets.size(); ++i) {
+      if (find(assignment.begin(), assignment.end(), i) == assignment.end()) {
+        tracks.push_back(
+            std::make_unique<CTrack>(tracker_type_, dets[i], 0, 300));
         cv::Rect2d currBox;
-        currBox.x = dets[j].bbox_.x;
-        currBox.y = dets[j].bbox_.y;
-        currBox.width = dets[j].bbox_.width;
-        currBox.height = dets[j].bbox_.height;
-        tracks[i]->init(frame, currBox);
-      } else {
-        tracks[i]->last_point_.is_raw_ = false;
-        tracks[i]->push_back(tracks[i]->last_point_);
+        currBox.x = dets[i].bbox_.x;
+        currBox.y = dets[i].bbox_.y;
+        currBox.width = dets[i].bbox_.width;
+        currBox.height = dets[i].bbox_.height;
+        tracks.back()->init(frame, currBox);
+        tracks.back()->skippedFrames_ = 0;
+      }
+    }
+
+    // Update trajectory
+    for (size_t i = 0; i < tracks.size(); i++) {
+      // If track updated less than one time, than filter state is not correct.
+      if (i < assignment.size()) {
+        int j = assignment[i];
+        if (j != -1) {
+          // If we have assigned detect, then update using its coordinates,
+          tracks[i]->skippedFrames_ = 0;
+          tracks[i]->push_back(dets[j]);
+          cv::Rect2d currBox;
+          currBox.x = dets[j].bbox_.x;
+          currBox.y = dets[j].bbox_.y;
+          currBox.width = dets[j].bbox_.width;
+          currBox.height = dets[j].bbox_.height;
+          tracks[i]->init(frame, currBox);
+        } else {
+          tracks[i]->last_point_.is_raw_ = false;
+          tracks[i]->push_back(tracks[i]->last_point_);
+        }
       }
     }
   }
